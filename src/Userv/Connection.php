@@ -7,6 +7,8 @@ namespace Userv;
  */
 class Connection
 {
+    public $connection;
+
     protected $server;
 
     public function __construct($connection, Server $server)

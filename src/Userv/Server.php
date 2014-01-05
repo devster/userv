@@ -4,6 +4,8 @@ namespace Userv;
 
 class Server
 {
+    public $socket;
+
     protected $isTelnet = false;
     protected $address;
     protected $port;
@@ -11,8 +13,6 @@ class Server
     protected $flags;
     protected $context;
     protected $handler;
-
-    protected $socket;
 
     public function __construct($address = null, $port = null)
     {
@@ -160,7 +160,7 @@ class Server
     /**
      * Extend this method to configure the server
      */
-    protected function configure()
+    public function configure()
     {
     }
 
@@ -201,6 +201,8 @@ class Server
 
             $this->url = sprintf('tcp://%s:%d', $this->address, $this->port);
         }
+
+        $this->setAddress(null)->setPort(null);
     }
 
     /**
