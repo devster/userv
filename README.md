@@ -1,6 +1,8 @@
 Userv
 =====
 
+[![Build Status](https://travis-ci.org/devster/userv.png?branch=master)](https://travis-ci.org/devster/userv)
+
 Micro PHP Socket server library
 
 ! work in progress!

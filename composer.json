@@ -1,0 +1,23 @@
+{
+    "name": "devster/userv",
+    "description": "Micro PHP library to build a socket server",
+    "keywords": ["socket", "server", "library", "micro"],
+    "homepage": "https://github.com/devster/userv",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jeremy Perret",
+            "email": "jeremy@devster.org",
+            "homepage": "https://github.com/devster"
+        }
+    ],
+
+    "autoload": {
+        "psr-0": { "Userv": "src/" }
+    },
+
+    "require": {
+        "php": ">=5.3.3"
+    }
+}
