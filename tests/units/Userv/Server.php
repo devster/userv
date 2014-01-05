@@ -11,13 +11,19 @@ class Server extends atoum\test
     {
     }
 
+    protected function getInitializeMethod()
+    {
+        $class = new \ReflectionClass(new Serv);
+        $method = $class->getMethod('initialize');
+        $method->setAccessible(true);
+
+        return $method;
+    }
+
     public function testAddressPort()
     {
         $serv = new Serv('127.0.0.1', '99');
-
-        $class = new \ReflectionClass($serv);
-        $method = $class->getMethod('initialize');
-        $method->setAccessible(true);
+        $method = $this->getInitializeMethod();
 
         $this
             ->if($method->invoke($serv))
@@ -32,6 +38,29 @@ class Server extends atoum\test
             ->and($method->invoke($serv))
             ->string($serv->getUrl())
                 ->isEqualTo('udp://8.8.8.8:10')
+            ->if($serv = new Serv)
+            ->exception(function() use ($method, $serv) {
+                $method->invoke($serv);
+            })
+                ->isInstanceOf('\InvalidArgumentException')
+                ->message
+                    ->contains('Both address and port are required')
+        ;
+    }
+
+    public function testFlags()
+    {
+        $serv = new Serv('127.0.0.1', '99');
+        $method = $this->getInitializeMethod();
+
+        $this
+            ->if($method->invoke($serv))
+            ->integer($serv->getFlags())
+                ->isEqualTo(STREAM_SERVER_BIND | STREAM_SERVER_LISTEN)
+            ->if($serv->setFlags(STREAM_SERVER_BIND))
+            ->and($method->invoke($serv))
+            ->integer($serv->getFlags())
+                ->isEqualTo(STREAM_SERVER_BIND)
         ;
     }
 }
