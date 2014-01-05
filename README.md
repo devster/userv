@@ -1,7 +1,7 @@
 Userv
 =====
 
-[![Build Status](https://travis-ci.org/devster/userv.png?branch=master)](https://travis-ci.org/devster/userv)
+[![Latest Stable Version](https://poser.pugx.org/devster/userv/v/stable.png)](https://packagist.org/packages/devster/userv) [![Build Status](https://travis-ci.org/devster/userv.png?branch=master)](https://travis-ci.org/devster/userv)
 
 Micro PHP Socket server library
 
