@@ -15,14 +15,14 @@ Quick usage
 Create a php file and copy the code below.
 
 ```php
-require '/userv/src/Userv/Server.php';
-require '/userv/src/Userv/Connection.php';
+require 'vendor/autoload.php';
 
 use Userv\Server;
+use Userv\Connection\TelnetConnection;
 
 $serv = new Server('127.0.0.1', 23);
 $serv
-    ->setTelnet(true)
+    ->setConnection(new TelnetConnection)
     ->setHandler(function($conn) {
         $conn->writeln('Hello, welcome on this telnet server, bouya!');
         $name = $conn->ask('What\'s your name? : ');
