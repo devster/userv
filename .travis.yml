@@ -4,5 +4,7 @@ php:
   - 5.4
   - 5.5
 before_script:
+  - wget http://getcomposer.org/composer.phar
+  - php composer.phar install
   - wget http://downloads.atoum.org/nightly/mageekguy.atoum.phar
 script: php mageekguy.atoum.phar
