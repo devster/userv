@@ -1,36 +1,9 @@
 <?php
 
-namespace Userv;
+namespace Userv\Connection;
 
-/**
- * This class represent a connection with a unique client
- */
-class Connection
+class ConsoleConnection extends Connection
 {
-    public $connection;
-
-    protected $server;
-
-    public function __construct($connection, Server $server)
-    {
-        if (! is_resource($connection)) {
-            throw new \InvalidArgumentException('Connection must be a resource');
-        }
-
-        $this->connection = $connection;
-        $this->server = $server;
-    }
-
-    /**
-     * Returns the Server instance
-     *
-     * @return Server
-     */
-    public function getServer()
-    {
-        return $this->server;
-    }
-
     /**
      * Ask a question to the client
      *
@@ -64,37 +37,6 @@ class Connection
     }
 
     /**
-     * Read the user input
-     *
-     * @return string
-     */
-    public function read()
-    {
-        static $firstUse = true;
-
-        $rep = trim(fgets($this->connection));
-
-        // TELNET HACK, the first time you get data from a telnet client
-        // you receive bad data concatenated with the client data
-        if ($this->server->isTelnet() && $firstUse) {
-            $firstUse = false;
-            $rep = substr($rep, strpos($rep, '#')+1);
-        }
-
-        return $rep;
-    }
-
-    /**
-     * Write on the socket
-     *
-     * @param  string $msg
-     */
-    public function write($msg)
-    {
-        fwrite($this->connection, $msg);
-    }
-
-    /**
      * Same as write but add an end line
      *
      * @param  string $msg
@@ -113,13 +55,5 @@ class Connection
     {
         $this->write("\x0D");
         $this->write($msg);
-    }
-
-    /**
-     * Close the connection with the client
-     */
-    public function close()
-    {
-        fclose($this->connection);
     }
 }

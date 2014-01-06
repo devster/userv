@@ -20,6 +20,47 @@ class Server extends atoum\test
         return $method;
     }
 
+    public function testConnection()
+    {
+        $serv = new Serv('127.0.0.1', '99');
+        $method = $this->getInitializeMethod();
+
+        $this
+            ->if($method->invoke($serv))
+            ->object($refConn = $serv->getConnection())
+                ->isInstanceOf('\Userv\Connection\ConsoleConnection')
+            ->if($conn = new \mock\Userv\Connection\Connection)
+            ->object($serv->setConnection($conn))
+                ->isInstanceOf('Userv\Server')
+            ->and($method->invoke($serv))
+            ->object($serv->getConnection())
+                ->isEqualTo($conn)
+                ->isNotEqualTo($refConn)
+        ;
+    }
+
+    public function testCreateConnection()
+    {
+        $serv = new Serv;
+        $refConn = new \Userv\Connection\Connection;
+        $serv->setConnection($refConn);
+
+        $f = fopen('php://stderr', 'w');
+
+        $class = new \ReflectionClass($serv);
+        $method = $class->getMethod('createConnection');
+        $method->setAccessible(true);
+
+        $this
+            ->object($conn = $method->invoke($serv, $f))
+                ->isInstanceOf('\Userv\Connection\Connection')
+            ->variable($conn->connection)
+                ->isEqualTo($f)
+            ->object($conn->server)
+                ->isEqualTo($serv)
+        ;
+    }
+
     public function testAddressPort()
     {
         $serv = new Serv('127.0.0.1', '99');
@@ -103,7 +144,7 @@ class Server extends atoum\test
 
         $this->mockGenerator->orphanize('__construct');
         $this->mockGenerator->shuntParentClassCalls();
-        $connMock = new \mock\Userv\Connection;
+        $connMock = new \mock\Userv\Connection\Connection;
 
         $this
             ->exception(function() use ($serv, $connMock) {

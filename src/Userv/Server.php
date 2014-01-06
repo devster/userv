@@ -2,17 +2,20 @@
 
 namespace Userv;
 
+use Userv\Connection\ConnectionInterface;
+use Userv\Connection\ConsoleConnection;
+
 class Server
 {
     public $socket;
 
-    protected $isTelnet = false;
     protected $address;
     protected $port;
     protected $url;
     protected $flags;
     protected $context;
     protected $handler;
+    protected $connectionModel;
 
     public function __construct($address = null, $port = null)
     {
@@ -22,16 +25,27 @@ class Server
         ;
     }
 
-    public function setTelnet($bool)
+    /**
+     * Set the connection object that the handler receive on each client connection
+     *
+     * @param ConnectionInterface $connection
+     * @return  Server the current instance
+     */
+    public function setConnection(ConnectionInterface $connection)
     {
-        $this->isTelnet = $bool;
+        $this->connectionModel = $connection;
 
         return $this;
     }
 
-    public function isTelnet()
+    /**
+     * Get the connection object
+     *
+     * @return ConnectionInterface
+     */
+    public function getConnection()
     {
-        return $this->isTelnet;
+        return $this->connectionModel;
     }
 
     /**
@@ -168,9 +182,9 @@ class Server
      * Extend this method to handle client connections
      *
      * @see  Server::setHandler
-     * @param  Connection $connection
+     * @param ConnectionInterface $connection
      */
-    public function handle(Connection $connection)
+    public function handle(ConnectionInterface $connection)
     {
         throw new \LogicException('A handler is required. Extend the method `handle` or use setHandler');
     }
@@ -181,6 +195,10 @@ class Server
     protected function initialize()
     {
         $this->configure();
+
+        if (is_null($this->connectionModel)) {
+            $this->connectionModel = new ConsoleConnection;
+        }
 
         if (is_null($this->handler)) {
             $this->handler = array($this, 'handle');
@@ -227,7 +245,7 @@ class Server
         }
 
         while ($conn = stream_socket_accept($this->socket, -1)) {
-            $connection = new Connection($conn, $this);
+            $connection = $this->createConnection($conn);
 
             if ($this->fork()) {
                 $connection->close();
@@ -239,6 +257,27 @@ class Server
         }
     }
 
+    /**
+     * Create a new Connection
+     *
+     * @param  resource $socketConnection
+     * @return ConnectionInterface
+     */
+    protected function createConnection($socketConnection)
+    {
+        $connection = clone $this->connectionModel;
+        $connection->setSocketConnection($socketConnection);
+        $connection->setServer($this);
+
+        return $connection;
+    }
+
+    /**
+     * Fork the current process
+     *
+     * @throws  \RuntimeException If fork fails
+     * @return boolean Returns true if parent process false if child process
+     */
     protected function fork()
     {
         $pid = pcntl_fork();

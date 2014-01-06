@@ -1,9 +1,9 @@
 <?php
 
-namespace Userv\Tests\Units;
+namespace Userv\Connection\Tests\Units;
 
 use Userv\Server;
-use Userv\Connection as Conn;
+use Userv\Connection\Connection as Conn;
 use mageekguy\atoum;
 
 class Connection extends atoum\test
@@ -19,22 +19,29 @@ class Connection extends atoum\test
 
     protected function getConnection()
     {
+        if ($this->tmpfile) {
+            unlink($this->tmpfile);
+        }
+
         $this->tmpfile = tempnam(sys_get_temp_dir(), 'userv');
-        return new Conn(fopen($this->tmpfile, 'w+'), new \mock\Userv\Server);
+        $conn = new Conn;
+        $conn->setSocketConnection(fopen($this->tmpfile, 'w+'));
+        $conn->setServer(new \mock\Userv\Server);
+        return $conn;
     }
 
     public function testConstruct()
     {
+        $conn = $this->getConnection();
         $this
-            ->exception(function() {
-                new Conn('test', new Server);
+            ->exception(function() use ($conn) {
+                $conn->setSocketConnection('test');
             })
                 ->isInstanceOf('\InvalidArgumentException')
         ;
 
         $this
-            ->if($conn = $this->getConnection())
-            ->object($conn->getServer())
+            ->object($conn->server)
                 ->isInstanceOf('\Userv\Server')
         ;
     }
