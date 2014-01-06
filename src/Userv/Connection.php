@@ -13,6 +13,10 @@ class Connection
 
     public function __construct($connection, Server $server)
     {
+        if (! is_resource($connection)) {
+            throw new \InvalidArgumentException('Connection must be a resource');
+        }
+
         $this->connection = $connection;
         $this->server = $server;
     }

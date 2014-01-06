@@ -148,7 +148,7 @@ class Server
      */
     public function setHandler($handler)
     {
-        if (! is_callable($handler) && ! $handler instanceof \Closure) {
+        if (! is_callable($handler)) {
             throw new \InvalidArgumentException('A handler must be a callable or a closure');
         }
 

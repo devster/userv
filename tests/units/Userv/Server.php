@@ -3,7 +3,6 @@
 namespace Userv\Tests\Units;
 
 use Userv\Server as Serv;
-use Userv\Connection;
 use mageekguy\atoum;
 
 class Server extends atoum\test
